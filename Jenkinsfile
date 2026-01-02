@@ -62,20 +62,24 @@ pipeline {
         stage('OWASP Dependency-Check (Docker)') {
     steps {
         sh '''
+        rm -rf dependency-check-reports
         mkdir -p dependency-check-reports
 
-        docker run --rm \
+        docker run --name dc-temp \
           -v "$(pwd)":/src \
           -v dc-data:/usr/share/dependency-check/data \
-          -v "$(pwd)/dependency-check-reports":/report \
           owasp/dependency-check:latest \
           --project "todo-ui-devsecops" \
           --scan /src \
           --format ALL \
-          --out /report
+          --out /tmp/report
+
+        docker cp dc-temp:/tmp/report/. dependency-check-reports/
+        docker rm dc-temp
         '''
     }
 }
+
 
         stage('Build App') {
             steps {
