@@ -76,13 +76,11 @@ pipeline {
         owasp/dependency-check:latest \
         --project "todo-ui-devsecops" \
         --scan /src \
-        --format "XML,HTML" \
+        --format ALL \
         --out /report
         '''
     }
 }
-
-
         stage('Build App') {
             steps {
                 sh 'npm run build'
