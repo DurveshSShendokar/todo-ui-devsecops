@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
-        APP_URL = 'http://4.240.60.209:4173'
+        APP_URL = 'http://4.213.97.72/:4173'
         SAST_STATUS = 'NOT_RUN'
         DAST_STATUS = 'NOT_RUN'
     }
@@ -116,12 +116,12 @@ pipeline {
                     sh '''
                     echo "Fetching SonarQube Quality Gate..."
                     curl -s -u $SONAR_TOKEN: \
-                    "http://4.240.60.209:9000/api/qualitygates/project_status?projectKey=todo-ui-devsecops" \
+                    "http://4.213.97.72:9000/api/qualitygates/project_status?projectKey=todo-ui-devsecops" \
                     > sonar-quality-gate.json
 
                     echo "Fetching SonarQube Metrics..."
                     curl -s -u $SONAR_TOKEN: \
-                    "http://4.240.60.209:9000/api/measures/component?component=todo-ui-devsecops&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density,ncloc" \
+                    "http://4.213.97.72:9000/api/measures/component?component=todo-ui-devsecops&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density,ncloc" \
                     > sonar-metrics.json
                     '''
                 }
