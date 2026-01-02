@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
-        APP_URL = 'http://4.213.97.72/:4173'
+        APP_URL = 'http://4.213.97.72:4173'
         SAST_STATUS = 'NOT_RUN'
         DAST_STATUS = 'NOT_RUN'
     }
