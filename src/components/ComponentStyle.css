@@ -1,0 +1,82 @@
+.button{
+    @apply  font-medium font-mono rounded-lg focus:ring-4 text-sm me-2 mb-2 w-auto
+}
+.btn-primary{
+    @apply text-white font-bold bg-blue-600 hover:bg-blue-700
+}
+.btn-secondary{
+    @apply text-white font-bold bg-slate-500 border-2 hover:bg-slate-600 hover:text-white
+}
+.btn-success{
+     @apply bg-green-600 text-white font-bold hover:bg-green-800
+
+}
+.btn-danger{
+    @apply bg-red-600 text-white font-bold hover:bg-red-800
+}
+.btn-warning{
+    @apply bg-yellow-300 text-gray-800 font-extrabold hover:bg-yellow-500 hover:text-white
+}
+
+.btn-dark{
+    @apply bg-gray-900 dark:bg-slate-500 text-white  font-extrabold
+}
+.btn-link {
+    @apply text-blue-600 hover:underline focus:hidden
+}
+
+
+.btn-outlined-primary{
+    @apply text-blue-600 font-extrabold border border-blue-700 hover:bg-blue-700 hover:text-white
+}
+.btn-outlined-secondary{
+    @apply text-slate-600 border font-extrabold border-slate-700 hover:bg-slate-700 hover:text-white
+}
+.btn-outlined-success{
+    @apply text-green-600 border font-extrabold border-green-700 hover:bg-green-700 hover:text-white
+}
+.btn-outlined-danger{
+    @apply text-red-600 font-extrabold border border-red-700 hover:bg-red-700 hover:text-white
+}
+.btn-outlined-warning{
+    @apply text-yellow-400  font-extrabold border border-yellow-300 hover:bg-yellow-300 hover:text-black
+}
+.btn-outlined-dark{
+    @apply text-gray-900  font-extrabold border border-black hover:bg-black hover:text-white
+}
+
+
+.size-extra-small{
+    @apply px-2.5 py-0.5 h-8
+}
+.size-small {
+    @apply px-3 py-1.5 h-10
+}
+.size-medium{
+    @apply px-5 py-2 h-10
+}
+.size-large{
+    @apply px-6 py-3 h-12
+}
+.size-extra-large{
+    @apply px-8 py-3.5 
+} 
+
+
+.input-label{
+    @apply block mb-3 mr-5 text-xl font-medium text-gray-900 dark:text-white
+}
+.input-field{
+    @apply text-gray-900 text-sm  bg-gray-50 border border-gray-300 rounded-lg focus:ring-1  transition duration-500 ease-in-out focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+}
+.dropdown-label{
+    @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white
+}
+.select{
+    @apply bg-gray-50 border border-gray-300  text-gray-900 text-sm rounded-lg focus:ring-1 transition duration-500 ease-in-out outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+}
+
+
+.card{
+    @apply  p-6 bg-white border border-gray-200 rounded-lg shadow  dark:bg-[#202020] dark:border-gray-700 
+}
