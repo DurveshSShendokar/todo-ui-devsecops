@@ -63,21 +63,20 @@ pipeline {
     steps {
         sh '''
         mkdir -p dependency-check-reports
-        chmod -R 777 dependency-check-reports
 
         docker run --rm \
-        -u 0 \
-        -v "$(pwd)":/src \
-        -v dc-data:/usr/share/dependency-check/data \
-        -v "$(pwd)/dependency-check-reports":/report \
-        owasp/dependency-check:latest \
-        --project "todo-ui-devsecops" \
-        --scan /src \
-        --format ALL \
-        --out /report
+          -v "$(pwd)":/src \
+          -v dc-data:/usr/share/dependency-check/data \
+          -v "$(pwd)/dependency-check-reports":/report \
+          owasp/dependency-check:latest \
+          --project "todo-ui-devsecops" \
+          --scan /src \
+          --format ALL \
+          --out /report
         '''
     }
 }
+
         stage('Build App') {
             steps {
                 sh 'npm run build'
