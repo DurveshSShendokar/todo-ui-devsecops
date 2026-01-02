@@ -60,22 +60,27 @@ pipeline {
             }
         }
         stage('OWASP Dependency-Check (Docker)') {
-            steps {
-                sh '''
-                mkdir -p dependency-check-reports
+    steps {
+        sh '''
+        mkdir -p dependency-check-reports
 
-                docker run --rm \
-                -v "$(pwd)":/src \
-                -v dc-data:/usr/share/dependency-check/data \
-                -v "$(pwd)/dependency-check-reports":/report \
-                owasp/dependency-check:latest \
-                --project "todo-ui-devsecops" \
-                --scan /src \
-                --format XML \
-                --out /report
-            '''
-            }
+        if [ ! -d "node_modules" ]; then
+          echo "node_modules missing, running npm install again"
+          npm install
+        fi
+
+        docker run --rm \
+        -v "$(pwd)":/src \
+        -v dc-data:/usr/share/dependency-check/data \
+        -v "$(pwd)/dependency-check-reports":/report \
+        owasp/dependency-check:latest \
+        --project "todo-ui-devsecops" \
+        --scan /src \
+        --format "XML,HTML" \
+        --out /report
+        '''
     }
+}
 
 
         stage('Build App') {
