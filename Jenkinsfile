@@ -63,13 +63,10 @@ pipeline {
     steps {
         sh '''
         mkdir -p dependency-check-reports
-
-        if [ ! -d "node_modules" ]; then
-          echo "node_modules missing, running npm install again"
-          npm install
-        fi
+        chmod -R 777 dependency-check-reports
 
         docker run --rm \
+        -u 0 \
         -v "$(pwd)":/src \
         -v dc-data:/usr/share/dependency-check/data \
         -v "$(pwd)/dependency-check-reports":/report \
