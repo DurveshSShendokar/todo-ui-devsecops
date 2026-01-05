@@ -59,28 +59,7 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency-Check (Docker)') {
-    steps {
-        sh '''
-        rm -rf dependency-check-reports
-        mkdir -p dependency-check-reports
-
-        docker run --name dc-temp \
-          -v "$(pwd)":/src \
-          -v dc-data:/usr/share/dependency-check/data \
-          owasp/dependency-check:latest \
-          --project "todo-ui-devsecops" \
-          --scan /src \
-          --format ALL \
-          --out /tmp/report
-
-        docker cp dc-temp:/tmp/report/. dependency-check-reports/
-        docker rm dc-temp
-        '''
-    }
-}
-
-
+        
         stage('Build App') {
             steps {
                 sh 'npm run build'
@@ -177,7 +156,6 @@ pipeline {
                 <h3>🔐 Security Scan Summary</h3>
                 <ul>
                     <li><b>SAST (SonarQube):</b> ${env.SAST_STATUS}</li>
-                    <li><b>SCA (Dependency-Check):</b> Completed</li>
                     <li><b>DAST (OWASP ZAP):</b> ${env.DAST_STATUS}</li>
                 </ul>
 
@@ -188,10 +166,6 @@ pipeline {
                     <li>
                         <b>SonarQube Quality Gate</b> →
                         <a href="${env.BUILD_URL}artifact/sonar-quality-gate.json">View</a>
-                    </li>
-                    <li>
-                        <b>OWASP Dependency-Check (HTML)</b> →
-                        <a href="${env.BUILD_URL}artifact/dependency-check-reports/dependency-check-report.html">View</a>
                     </li>
                     <li>
                         <b>OWASP ZAP DAST</b> →
@@ -214,8 +188,7 @@ pipeline {
             zap-report.html,
             sonar-quality-gate.json,
             sonar-metrics.json,
-            sonar-env.txt,
-            dependency-check-reports/*
+            sonar-env.txt
         ''', allowEmptyArchive: true
 
         sh 'pkill -f "npm run preview" || true'
