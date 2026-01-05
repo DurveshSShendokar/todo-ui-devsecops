@@ -142,7 +142,7 @@ pipeline {
     <html>
     <body style="font-family: Arial, sans-serif;">
 
-    <h2 style="color:#2F80ED;">🚀 DevSecOps Pipeline Report</h2>
+    <h2 style="color:#2F80ED;">DevSecOps Pipeline Report</h2>
 
     <table cellpadding="6">
         <tr><td><b>Job</b></td><td>${env.JOB_NAME}</td></tr>
