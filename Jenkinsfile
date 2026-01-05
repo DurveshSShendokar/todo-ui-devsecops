@@ -8,8 +8,6 @@ pipeline {
     environment {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
         APP_URL = 'http://4.213.97.72:4173'
-        SAST_STATUS = 'NOT_RUN'
-        DAST_STATUS = 'NOT_RUN'
     }
 
     stages {
@@ -46,16 +44,8 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                script {
-                    try {
-                        timeout(time: 2, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                        }
-                    env.SAST_STATUS = 'PASSED'
-                    } catch (err) {
-                        env.SAST_STATUS = 'FAILED'
-                        throw err
-                    }
+                timeout(time: 2, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -69,8 +59,16 @@ pipeline {
         stage('Start App for DAST') {
             steps {
                 sh '''
-                  nohup npm run preview -- --host 0.0.0.0 --port 4173 > app.log 2>&1 &
-                  sleep 20
+  nohup npm run preview -- --host 0.0.0.0 --port 4173 > app.log 2>&1 &
+
+          for i in {1..10}; do
+            if curl -s http://localhost:4173 >/dev/null; then
+              echo "Application is up on port 4173"
+              break
+            fi
+            echo "Waiting for application..."
+                sleep 5
+            done
                 '''
             }
         }
@@ -86,9 +84,6 @@ pipeline {
                 -t ${APP_URL} \
                 -r zap-report.html || true
                 '''
-            script {
-            env.DAST_STATUS = 'COMPLETED'
-            }
         }
     }
 
@@ -139,50 +134,61 @@ pipeline {
     always {
 
         emailext(
-            to: 'durveshsshendokar@gmail.com',
-            from: 'durveshsshendokar@gmail.com',
-            subject: "DevSecOps Pipeline Report - ${currentBuild.currentResult}",
-            mimeType: 'text/html',
-            body: """
-                <h2>🚀 DevSecOps Pipeline Report</h2>
+    to: 'durveshsshendokar@gmail.com',
+    from: 'durveshsshendokar@gmail.com',
+    subject: "DevSecOps Pipeline Result: ${currentBuild.currentResult} | ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+    mimeType: 'text/html',
+    body: """
+    <html>
+    <body style="font-family: Arial, sans-serif;">
 
-                <p><b>Job:</b> ${env.JOB_NAME}</p>
-                <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
-                <p><b>Status:</b> <b>${currentBuild.currentResult}</b></p>
-                <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+    <h2 style="color:#2F80ED;">🚀 DevSecOps Pipeline Report</h2>
 
-                <hr/>
+    <table cellpadding="6">
+        <tr><td><b>Job</b></td><td>${env.JOB_NAME}</td></tr>
+        <tr><td><b>Build Number</b></td><td>#${env.BUILD_NUMBER}</td></tr>
+        <tr><td><b>Status</b></td><td><b>${currentBuild.currentResult}</b></td></tr>
+        <tr><td><b>Triggered By</b></td><td>GitHub Push</td></tr>
+    </table>
 
-                <h3>🔐 Security Scan Summary</h3>
-                <ul>
-                    <li><b>SAST (SonarQube):</b> ${env.SAST_STATUS}</li>
-                    <li><b>DAST (OWASP ZAP):</b> ${env.DAST_STATUS}</li>
-                </ul>
+    <p>
+        🔗 <b>Build URL:</b>
+        <a href="${env.BUILD_URL}">${env.BUILD_URL}</a>
+    </p>
 
-                <hr/>
+    <hr/>
 
-                <h3>📊 Reports (Jenkins Artifacts)</h3>
-                <ul>
-                    <li>
-                        <b>SonarQube Quality Gate</b> →
-                        <a href="${env.BUILD_URL}artifact/sonar-quality-gate.json">View</a>
-                    </li>
-                    <li>
-                        <b>OWASP ZAP DAST</b> →
-                        <a href="${env.BUILD_URL}artifact/zap-report.html">View</a>
-                    </li>
-                </ul>
+    <h3>📊 Security & Code Quality Reports</h3>
+    <ul>
+        <li>
+            <b>SonarQube Quality Gate</b> →
+            <a href="${env.BUILD_URL}artifact/sonar-quality-gate.json">View</a>
+        </li>
 
-                <p style="color:gray;">
-                ⚠️ Large security reports are hosted in Jenkins to avoid email size and security restrictions.
-                </p>
+        <li>
+            <b>SonarQube Metrics</b> →
+            <a href="${env.BUILD_URL}artifact/sonar-metrics.json">View</a>
+        </li>
 
-                <p><b>Triggered By:</b> GitHub Push</p>
+        <li>
+            <b>OWASP ZAP DAST Report</b> →
+            <a href="${env.BUILD_URL}artifact/zap-report.html">View</a>
+        </li>
+    </ul>
 
-                <br/>
-                <p>— Jenkins DevSecOps Pipeline</p>
-            """
-        )
+    <p style="color:gray; font-size:12px;">
+        ⚠️ Large security reports are stored as Jenkins artifacts to avoid email size limitations.
+    </p>
+
+    <br/>
+    <p style="color:#555;">
+        — Jenkins DevSecOps Pipeline
+    </p>
+
+    </body>
+    </html>
+    """
+)
 
         archiveArtifacts artifacts: '''
             zap-report.html,
@@ -195,7 +201,7 @@ pipeline {
     }
 
         success {
-            echo '✅ Pipeline completed successfully (SAST + SCA + DAST)'
+            echo '✅ Pipeline completed successfully (SAST + DAST)'
         }
 
         failure {
