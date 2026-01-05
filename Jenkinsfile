@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
-        APP_URL = 'http://localhost:4173'
+        APP_URL = 'http://4.213.97.72:4173'
     }
 
     stages {
@@ -62,7 +62,7 @@ pipeline {
   nohup npm run preview -- --host 0.0.0.0 --port 4173 > app.log 2>&1 &
 
           for i in {1..10}; do
-            if curl -s http://localhost:4173 >/dev/null; then
+            if curl -s http://4.213.97.72:4173 >/dev/null; then
               echo "Application is up on port 4173"
               break
             fi
