@@ -56,23 +56,6 @@ pipeline {
             }
         }
 
-        stage('Start App for DAST') {
-            steps {
-                sh '''
-  nohup npm run preview -- --host 0.0.0.0 --port 4173 > app.log 2>&1 &
-
-          for i in {1..10}; do
-            if curl -s http://4.213.97.72:4173 >/dev/null; then
-              echo "Application is up on port 4173"
-              break
-            fi
-            echo "Waiting for application..."
-                sleep 5
-            done
-                '''
-            }
-        }
-
         stage('OWASP ZAP DAST (Docker)') {
             steps {
                 sh '''
@@ -84,8 +67,28 @@ pipeline {
                 -t ${APP_URL} \
                 -r zap-report.html || true
                 '''
+            }
         }
-    }
+        stage('Deploy UI') {
+            steps {
+                sh '''
+                echo "Starting UI Deployment..."
+
+                DEPLOY_DIR="/home/zionit/zioteams/todo-ui"
+
+                if [ ! -d "$DEPLOY_DIR" ]; then
+                  echo "ERROR: Deployment directory does not exist!"
+                exit 1
+                fi
+
+                rm -rf ${DEPLOY_DIR:?}/*
+                cp -r dist/* $DEPLOY_DIR/
+
+                echo "Deployment completed"
+                ls -la $DEPLOY_DIR
+                '''
+            }
+        }
 
         stage('Fetch SonarQube Report') {
             steps {
@@ -196,8 +199,6 @@ pipeline {
             sonar-metrics.json,
             sonar-env.txt
         ''', allowEmptyArchive: true
-
-        sh 'pkill -f "npm run preview" || true'
     }
 
         success {
