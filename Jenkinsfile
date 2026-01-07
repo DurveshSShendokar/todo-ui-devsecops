@@ -80,12 +80,11 @@ pipeline {
             steps {
                 sh '''
                 docker run --rm \
+                --network=host \
                 -u 0 \
                 -v "$(pwd)":/zap/wrk \
                 ghcr.io/zaproxy/zaproxy:stable \
-                zap-baseline.py \
-                -t ${APP_URL} \
-                -r zap-report.html || true
+                zap-baseline.py -t ${APP_URL} -r zap-report.html
                 '''
             }
         }
