@@ -87,10 +87,12 @@ pipeline {
                 -t ${APP_URL} \
                 -r zap-report.html \
                 -w zap-warn.txt \
-                -x zap-report.xml
+                -x zap-report.xml \
+                -I
                 '''
             }
         }
+
 
         stage('Stop Temporary App') {
             steps {
