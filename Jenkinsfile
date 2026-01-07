@@ -7,7 +7,8 @@ pipeline {
 
     environment {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
-        APP_URL = 'http://4.213.97.72:4173'
+        APP_URL = 'http://127.0.0.1:4172'
+
     }
 
     stages {
@@ -55,6 +56,25 @@ pipeline {
                 sh 'npm run build'
             }
         }
+        stage('Start App for DAST') {
+            steps {
+                sh '''
+                echo "Starting temporary app for DAST..."
+
+                npm run preview -- --host 127.0.0.1 --port 4172 > app.log 2>&1 &
+
+                for i in {1..10}; do
+                    if curl -s http://127.0.0.1:4172 >/dev/null; then
+                        echo "Temporary app is running on 4172"
+                    break
+                    fi
+                    echo "Waiting for temporary app..."
+                    sleep 5
+                done
+                '''
+            }
+        }
+
 
         stage('OWASP ZAP DAST (Docker)') {
             steps {
@@ -69,6 +89,15 @@ pipeline {
                 '''
             }
         }
+        stage('Stop Temporary App') {
+            steps {
+                sh '''
+                echo "Stopping temporary preview app..."
+                pkill -f "npm run preview" || true
+                '''
+            }
+        }
+
         stage('Deploy UI') {
             steps {
                 sh '''
