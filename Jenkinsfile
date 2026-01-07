@@ -171,7 +171,7 @@ pipeline {
     always {
 
         emailext(
-    to: 'durveshsshendokar@gmail.com',
+    to: 'durveshsshendokar@gmail.com,khushwant.yadav@zionit.in',
     from: 'durveshsshendokar@gmail.com',
     subject: "DevSecOps Pipeline Result: ${currentBuild.currentResult} | ${env.JOB_NAME} #${env.BUILD_NUMBER}",
     mimeType: 'text/html',
