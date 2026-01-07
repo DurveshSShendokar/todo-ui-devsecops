@@ -93,15 +93,40 @@ pipeline {
             }
         }
 
-
-        stage('Stop Temporary App') {
+        stage('ZAP Quality Gate') {
             steps {
                 sh '''
-                echo "Stopping temporary preview app..."
-                pkill -f "npm run preview" || true
+                echo "Evaluating ZAP Quality Gate..."
+        
+                HIGH=$(grep -c "<riskcode>3</riskcode>" zap-report.xml || true)
+                MEDIUM=$(grep -c "<riskcode>2</riskcode>" zap-report.xml || true)
+                LOW=$(grep -c "<riskcode>1</riskcode>" zap-report.xml || true)
+        
+                echo "ZAP Findings:"
+                echo "High: $HIGH"
+                echo "Medium: $MEDIUM"
+                echo "Low: $LOW"
+        
+                if [ "$HIGH" -gt 0 ]; then
+                  echo "❌ ZAP Quality Gate failed: High risk findings detected"
+                  exit 1
+                fi
+        
+                if [ "$MEDIUM" -gt 0 ]; then
+                  echo "❌ ZAP Quality Gate failed: Medium risk findings detected"
+                  exit 1
+                fi
+        
+                if [ "$LOW" -gt 5 ]; then
+                  echo "❌ ZAP Quality Gate failed: Too many Low risk findings"
+                  exit 1
+                fi
+        
+                echo "✅ ZAP Quality Gate passed"
                 '''
             }
         }
+
 
         stage('Deploy UI') {
             steps {
@@ -169,7 +194,9 @@ pipeline {
 
     post {
     always {
-
+        echo "Cleaning up preview app..."
+        sh 'pkill -f "npm run preview" || true'
+        
         emailext(
     to: 'durveshsshendokar@gmail.com,khushwant.yadav@zionit.in',
     from: 'durveshsshendokar@gmail.com',
