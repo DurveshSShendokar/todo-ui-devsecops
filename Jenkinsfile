@@ -79,15 +79,19 @@ pipeline {
         stage('OWASP ZAP DAST (Docker)') {
             steps {
                 sh '''
-                docker run --rm \
-                --network=host \
+                docker run --rm --network=host \
                 -u 0 \
                 -v "$(pwd)":/zap/wrk \
                 ghcr.io/zaproxy/zaproxy:stable \
-                zap-baseline.py -t ${APP_URL} -r zap-report.html
+                zap-baseline.py \
+                -t ${APP_URL} \
+                -r zap-report.html \
+                -w zap-warn.txt \
+                -x zap-report.xml
                 '''
             }
         }
+
         stage('Stop Temporary App') {
             steps {
                 sh '''
@@ -223,6 +227,8 @@ pipeline {
 
         archiveArtifacts artifacts: '''
             zap-report.html,
+            zap-warn.txt,
+            zap-report.xml,
             sonar-quality-gate.json,
             sonar-metrics.json,
             sonar-env.txt
