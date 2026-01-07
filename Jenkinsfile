@@ -55,6 +55,17 @@ pipeline {
                 sh 'npm run build'
             }
         }
+        stage('Start App for DAST') { 
+            steps { 
+                sh ''' npm run preview -- --host 0.0.0.0 --port 4172 > app.log 2>&1 & 
+                for i in {1..10}; do 
+                    if curl -s http://4.213.97.72:4172 >/dev/null; then 
+                    echo "Temporary app is running on 4172" 
+                    break 
+                    fi 
+                        echo "Waiting for temporary app..." sleep 5 done ''' 
+            } 
+        }
 
         stage('OWASP ZAP DAST (Docker)') {
             steps {
@@ -199,6 +210,7 @@ pipeline {
             sonar-metrics.json,
             sonar-env.txt
         ''', allowEmptyArchive: true
+        pkill -f "npm run preview" || true
     }
 
         success {
