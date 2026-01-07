@@ -210,7 +210,6 @@ pipeline {
             sonar-metrics.json,
             sonar-env.txt
         ''', allowEmptyArchive: true
-        pkill -f "npm run preview" || true
     }
 
         success {
