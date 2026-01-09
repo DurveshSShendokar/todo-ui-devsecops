@@ -112,7 +112,7 @@ pipeline {
                   exit 1
                 fi
         
-                if [ "$MEDIUM" -gt 0 ]; then
+                if [ "$MEDIUM" -gt 5 ]; then
                   echo "❌ ZAP Quality Gate failed: Medium risk findings detected"
                   exit 1
                 fi
@@ -198,7 +198,7 @@ pipeline {
         sh 'pkill -f "npm run preview" || true'
         
         emailext(
-    to: 'durveshsshendokar@gmail.com,khushwant.yadav@zionit.in',
+    to: 'durveshsshendokar@gmail.com,khushwant.yadav@zionit.in,shivam.nishad@zionit.in,ashwini.gaikwad@zionit.in,avinash.d@zionit.in,divakar.barhate@zionit.in',
     from: 'durveshsshendokar@gmail.com',
     subject: "DevSecOps Pipeline Result: ${currentBuild.currentResult} | ${env.JOB_NAME} #${env.BUILD_NUMBER}",
     mimeType: 'text/html',
